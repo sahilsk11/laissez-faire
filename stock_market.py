@@ -23,18 +23,16 @@ class StockMarket:
     self.open_buy_orders = []
 
     # in this initial market we assume no price has
-    # been set yet
+    # been set until a buyer bids
     self.price_per_share = None
 
     # maintain a ledger of all historic transactions
     self.order_book = []
 
-  # when a buyer buys a share, they are providing
-  # their own money and we decrease the number of shares
+  # our trading algorithm will traverse through
+  # open sell orders and find the highest acceptable
+  # offer
   def buy_shares(self, username, requested_shares, limit_price):
-    # our trading algorithm will traverse through
-    # open sell orders and find the highest matching
-    # offers
 
     # track the individual orders that comprise
     # the larger transaction
@@ -57,7 +55,7 @@ class StockMarket:
           "num_shares": purchased_shares,
           "price": offer["ask_price"]
         })
-      self.cleanup_empty_orders()
+    self.cleanup_empty_orders()
 
     # if there are outstanding requested shares that were
     # not able to get bought, add them to the queue of pending
@@ -140,7 +138,7 @@ class StockMarket:
         "num_shares": outstanding_request_shares,
         "ask_price": limit_price
       })
-      self.open_sell_orders.sort(key=itemgetter("ask_price"))
+      self.open_sell_orders.sort(key=itemgetter("ask_price"), reverse=True)
     
     # construct order details from the transaction
     order_details = {
